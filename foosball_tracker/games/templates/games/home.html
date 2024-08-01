@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="top-players">
+        <h2>Top Players</h2>
+        <ol>
+            {% for player in players %}
+                <li>
+                  <a href="{% url 'player-detail' player.id %}"><strong>{{ player.name }}</strong></a> - Games Won: {{ player.games_won }} - Win Ratio: {{ player.win_ratio|floatformat:2 }} - Best Position: {{ player.best_position }}
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+
+    <div class="ongoing-games">
+        <h2>Ongoing Games</h2>
+        <ul>
+            {% for game in ongoing_games %}
+                <li>
+                    <a href="{% url 'game-detail' game.id %}">
+                        {{ game.left_offense.name }} & {{ game.left_defense.name }} vs 
+                        {{ game.right_offense.name }} & {{ game.right_defense.name }} - Date: {{ game.date|date:"d M Y" }}
+                    </a>
+                    <ul>
+                        {% for match in game.matches.all %}
+                            <li>
+                                {{ match.left_offense.name }} & {{ match.left_defense.name }} ({{ match.left_score }}) vs 
+                                {{ match.right_offense.name }} & {{ match.right_defense.name }} ({{ match.right_score }})
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% empty %}
+                <li>No ongoing games.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="completed-games">
+        <h2>Completed Games</h2>
+        <ul>
+            {% for summary in game_summary %}
+                <li>
+                    <a href="{% url 'game-detail' summary.game.id %}">
+                        {{ summary.left_team }} - Wins: {{ summary.left_team_wins }}<br>
+                        {{ summary.right_team }} - Wins: {{ summary.right_team_wins }}<br>
+                        Date: {{ summary.game.date|date:"d M Y" }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>No completed games.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="whitewashes">
+        <h2>Whitewashes</h2>
+        <ul>
+            {% for match in whitewashes %}
+                <li>
+                    <a href="{% url 'game-detail' match.game.id %}">
+                        {{ match.left_offense.name }} & {{ match.left_defense.name }} ({{ match.left_score }}) vs 
+                        {{ match.right_offense.name }} & {{ match.right_defense.name }} ({{ match.right_score }})
+                    </a>
+                </li>
+            {% empty %}
+                <li>No whitewashes.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

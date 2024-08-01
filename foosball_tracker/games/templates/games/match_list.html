@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Match List{% endblock %}
+
+{% block content %}
+<h1>Match List</h1>
+
+<div class="container">
+    <div class="current-games">
+        {% for match in matches %}
+            <div class="match-item">
+                <p>{{ match.left_offense.name }} & {{ match.left_defense.name }}: {{ match.left_score }} - {{ match.right_score }} {{ match.right_offense.name }} & {{ match.right_defense.name }}</p>
+            </div>
+        {% empty %}
+            <p>No matches available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

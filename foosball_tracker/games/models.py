@@ -1,36 +1,103 @@
 from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db.models import Sum, Q, F
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
+    start_date = models.DateField(default=timezone.now)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
 
-class Team(models.Model):
-    name = models.CharField(max_length=100, unique=True, null=True, blank=True)
-    player1 = models.ForeignKey(Player, related_name='teams_as_player1', on_delete=models.CASCADE)
-    player2 = models.ForeignKey(Player, related_name='teams_as_player2', on_delete=models.CASCADE, null=True, blank=True)
+    def games_won(self):
+        return Match.objects.filter(
+            (Q(left_offense=self) | Q(left_defense=self)) & Q(left_score__gt=F('right_score')) |
+            (Q(right_offense=self) | Q(right_defense=self)) & Q(right_score__gt=F('left_score'))
+        ).count()
 
-    def __str__(self):
-        if self.player2:
-            return f'{self.player1} & {self.player2}'
-        return str(self.player1)
+    def total_points(self):
+        left_points = Match.objects.filter(
+            Q(left_offense=self) | Q(left_defense=self)
+        ).aggregate(total=Sum('left_score'))['total'] or 0
+        right_points = Match.objects.filter(
+            Q(right_offense=self) | Q(right_defense=self)
+        ).aggregate(total=Sum('right_score'))['total'] or 0
+        return left_points + right_points
+
+    def win_ratio(self):
+        total_matches = Match.objects.filter(
+            Q(left_offense=self) | Q(left_defense=self) | Q(right_offense=self) | Q(right_defense=self)
+        ).count()
+        return self.games_won() / total_matches if total_matches else 0
+
+    def best_position(self):
+        defense_wins = Match.objects.filter(left_defense=self, left_score__gt=F('right_score')).count() + \
+                       Match.objects.filter(right_defense=self, right_score__gt=F('left_score')).count()
+        offense_wins = Match.objects.filter(left_offense=self, left_score__gt=F('right_score')).count() + \
+                       Match.objects.filter(right_offense=self, right_score__gt=F('left_score')).count()
+        return 'Defense' if defense_wins > offense_wins else 'Offense'
+
+    def most_successful_teammate(self):
+        from django.db.models import Count
+        teammates = Player.objects.annotate(
+            win_count=Count('left_defense_matches__left_offense') + Count('right_defense_matches__right_offense')
+        ).order_by('-win_count')
+        return teammates.first()
 
 class Game(models.Model):
-    team1 = models.ForeignKey(Team, related_name='games_as_team1', on_delete=models.CASCADE)
-    team2 = models.ForeignKey(Team, related_name='games_as_team2', on_delete=models.CASCADE)
-    best_of = models.IntegerField(default=3)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
+    in_progress = models.BooleanField(default=True)  # To track ongoing games
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    left_team_wins = models.IntegerField(default=0)
+    right_team_wins = models.IntegerField(default=0)
+    #left_offense = models.ForeignKey(Player, related_name='left_offense_games', on_delete=models.CASCADE)
+    #left_defense = models.ForeignKey(Player, related_name='left_defense_games', on_delete=models.CASCADE)
+    #right_offense = models.ForeignKey(Player, related_name='right_offense_games', on_delete=models.CASCADE)
+    #right_defense = models.ForeignKey(Player, related_name='right_defense_games', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.team1} vs {self.team2} on {self.date}'
+        return f"Game on {self.date}"
+    
+    def mark_as_completed(self):
+        self.in_progress = False
+        self.save()
 
-class Round(models.Model):
-    game = models.ForeignKey(Game, related_name='rounds', on_delete=models.CASCADE)
-    team1_score = models.IntegerField()
-    team2_score = models.IntegerField()
-    side = models.CharField(max_length=50)
-    round_number = models.IntegerField()
+class Match(models.Model):
+    game = models.ForeignKey(Game, related_name='matches', on_delete=models.CASCADE)
+    left_offense = models.ForeignKey(Player, related_name='left_offense_matches', on_delete=models.CASCADE)
+    left_defense = models.ForeignKey(Player, related_name='left_defense_matches', on_delete=models.CASCADE)
+    right_offense = models.ForeignKey(Player, related_name='right_offense_matches', on_delete=models.CASCADE)
+    right_defense = models.ForeignKey(Player, related_name='right_defense_matches', on_delete=models.CASCADE)
+    left_score = models.IntegerField()
+    right_score = models.IntegerField()
+    date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'Round {self.round_number}: {self.team1_score}-{self.team2_score} on {self.side}'
+        return f"{self.game} - {self.left_score} vs {self.right_score}"
+
+    def winner(self):
+        if self.left_score > self.right_score:
+            return 'Left'
+        elif self.right_score > self.left_score:
+            return 'Right'
+        return 'Draw'
+
+    def clean(self):
+        super().clean()
+        if self.left_score < 0 or self.left_score > 10 or self.right_score < 0 or self.right_score > 10:
+            raise ValidationError('Score must be between 0 and 10.')
+        if self.left_offense == self.left_defense or self.right_offense == self.right_defense:
+            raise ValidationError('A player cannot be on both positions in the same team.')
+        if self.left_offense in [self.right_offense, self.right_defense] or self.left_defense in [self.right_offense, self.right_defense]:
+            raise ValidationError('A player cannot be on both teams.')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.winner() == 'Left':
+            self.game.left_team_wins += 1
+        elif self.winner() == 'Right':
+            self.game.right_team_wins += 1
+        self.game.save()

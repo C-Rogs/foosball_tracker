@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Game Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="section-title">Game Details</h1>
+
+    <div class="game-detail">
+        <p><strong>Date:</strong> {{ game.date|date:"d M Y" }}</p>
+        <p><strong>Status:</strong> {% if game.in_progress %}Ongoing{% else %}Completed{% endif %}</p>
+
+        <h2>Matches</h2>
+        <div class="matches-list">
+            {% for match in game.matches.all %}
+                <div class="match-item">
+                    <p>{{ match.left_offense.name }} & {{ match.left_defense.name }} ({{ match.left_score }}) vs 
+                    {{ match.right_offense.name }} & {{ match.right_defense.name }} ({{ match.right_score }})</p>
+                </div>
+            {% empty %}
+                <p>No matches for this game.</p>
+            {% endfor %}
+        </div>
+
+        {% if game.in_progress %}
+            <a href="{% url 'add-match' game.id %}" class="button">Add Match</a>
+            <form action="{% url 'mark-game-as-completed' game.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="button">Mark as Completed</button>
+            </form>
+        {% else %}
+            <p>This game is completed and no new matches can be added.</p>
+        {% endif %}
+
+        <a href="{% url 'game-list' %}" class="button">Back to Game List</a>
+    </div>
+</div>
+{% endblock %}

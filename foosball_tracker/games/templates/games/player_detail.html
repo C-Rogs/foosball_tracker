@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ player.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="player-detail">
+        <h1>{{ player.name }}</h1>
+        <div class="player-info">
+            <p><strong>Start Date:</strong> {{ player.start_date }}</p>
+            <p><strong>Active:</strong> {{ player.is_active|yesno:"Yes,No" }}</p>
+            <p><strong>Games Won:</strong> {{ player.games_won }}</p>
+            <p><strong>Total Points:</strong> {{ player.total_points }}</p>
+            <p><strong>Win Ratio:</strong> {{ player.win_ratio|floatformat:2|add:"%" }}</p>
+            <p><strong>Best Position:</strong> {{ player.best_position }}</p>
+            <p><strong>Most Successful Teammate:</strong> 
+                {% if player.most_successful_teammate %}
+                    {{ player.most_successful_teammate.name }}
+                {% else %}
+                    None
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'player-list' %}" class="button">Back to Player List</a>
+    </div>
+</div>
+{% endblock %}

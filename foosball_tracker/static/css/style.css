@@ -1,0 +1,190 @@
+/* General Reset and Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Navigation Bar Styling */
+nav {
+    background-color: #333;
+    padding: 10px 0;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Header/Footer Styling */
+header, footer {
+    background-color: #f8f8f8;
+    padding: 10px 0;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    border-bottom: none;
+    border-radius: 0 0 15px 15px;
+}
+
+footer {
+    border-top: 1px solid #ddd;
+    border-radius: 15px 15px 0 0;
+}
+
+/* Content Area Styling */
+.top-players, .ongoing-games, .completed-games, .whitewashes, .matches {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.top-players ul, .ongoing-games ul, .completed-games ul, .whitewashes ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.top-players li, .ongoing-games li, .completed-games li, .whitewashes li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.top-players li:last-child, .ongoing-games li:last-child, .completed-games li:last-child, .whitewashes li:last-child {
+    border-bottom: none;
+}
+
+/* Button Styling */
+button {
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #cc5200;
+}
+a.button {
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 1px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+a.button:hover {
+    background-color: #cc5200;
+}
+.navbar-right {
+    margin-left: auto; /* Pushes the button to the far right */
+}
+
+/* Section Title */
+.section-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Player List Styling */
+.player-list {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+}
+
+.player-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.player-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.player-list li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+}
+
+.player-list li a:hover {
+    text-decoration: underline;
+}
+
+
+/* Game List Styling */
+.game-list {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+}
+
+.game-item {
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.game-item:last-child {
+    border-bottom: none;
+}
+
+.game-header p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.game-header p:last-child {
+    margin-top: 5px;
+}
