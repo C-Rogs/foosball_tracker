@@ -59,7 +59,18 @@ class Game(models.Model):
     #right_defense = models.ForeignKey(Player, related_name='right_defense_games', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Game on {self.date}"
+        return f"Game on {self.date.date()}"
+    
+    def get_first_match_players(self):
+        first_match = self.matches.first()
+        if first_match:
+            return (first_match.left_offense, first_match.left_defense, first_match.right_offense, first_match.right_defense)
+        else:
+            return ("Unknown Player", "Unknown Player", "Unknown Player", "Unknown Player")
+
+    def get_game_title(self):
+        left_offense, left_defense, right_offense, right_defense = self.get_first_match_players()
+        return f"{left_offense} & {left_defense} vs {right_offense} & {right_defense}"
     
     def mark_as_completed(self):
         self.in_progress = False
@@ -89,6 +100,10 @@ class Match(models.Model):
         super().clean()
         if self.left_score < 0 or self.left_score > 10 or self.right_score < 0 or self.right_score > 10:
             raise ValidationError('Score must be between 0 and 10.')
+        if self.left_score != 10 and self.right_score != 10:
+            raise ValidationError('One team must score 10 to win!')
+        if self.left_score == 10 and self.right_score == 10:
+            raise ValidationError('Only one team can win!')
         if self.left_offense == self.left_defense or self.right_offense == self.right_defense:
             raise ValidationError('A player cannot be on both positions in the same team.')
         if self.left_offense in [self.right_offense, self.right_defense] or self.left_defense in [self.right_offense, self.right_defense]:

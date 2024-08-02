@@ -20,10 +20,7 @@
         <ul>
             {% for game in ongoing_games %}
                 <li>
-                    <a href="{% url 'game-detail' game.id %}">
-                        {{ game.left_offense.name }} & {{ game.left_defense.name }} vs 
-                        {{ game.right_offense.name }} & {{ game.right_defense.name }} - Date: {{ game.date|date:"d M Y" }}
-                    </a>
+                    <a href="{% url 'game-detail' game.id %}">{{ game.get_game_title }}</a>
                     <ul>
                         {% for match in game.matches.all %}
                             <li>
@@ -44,11 +41,9 @@
         <ul>
             {% for summary in game_summary %}
                 <li>
-                    <a href="{% url 'game-detail' summary.game.id %}">
-                        {{ summary.left_team }} - Wins: {{ summary.left_team_wins }}<br>
-                        {{ summary.right_team }} - Wins: {{ summary.right_team_wins }}<br>
-                        Date: {{ summary.game.date|date:"d M Y" }}
-                    </a>
+                    <a href="{% url 'game-detail' summary.game.id %}">{{ summary.title }}</a><br>
+                    Points: {{ summary.left_team_wins }} - {{ summary.right_team_wins }}<br>
+                    Date: {{ summary.game.date|date:"d M Y" }}
                 </li>
             {% empty %}
                 <li>No completed games.</li>

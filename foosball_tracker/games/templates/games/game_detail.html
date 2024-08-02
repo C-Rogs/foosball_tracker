@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="section-title">Game Details</h1>
+    <h1 class="section-title">Game Details: {{ game.get_game_title }}</h1>
 
     <div class="game-detail">
         <p><strong>Date:</strong> {{ game.date|date:"d M Y" }}</p>
@@ -24,7 +24,7 @@
 
         {% if game.in_progress %}
             <a href="{% url 'add-match' game.id %}" class="button">Add Match</a>
-            <form action="{% url 'mark-game-as-completed' game.id %}" method="post" style="display:inline;">
+            <form action="{% url 'mark-game-completed' game.id %}" method="post" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="button">Mark as Completed</button>
             </form>

@@ -15,7 +15,7 @@ def home(request):
     ongoing_games = Game.objects.filter(in_progress=True)
     completed_games = Game.objects.filter(in_progress=False)
 
-        # For each completed game, calculate the total matches won
+    # Create a summary for completed games
     game_summary = []
     for game in completed_games:
         matches = game.matches.all()
@@ -27,6 +27,7 @@ def home(request):
         ).count()
         game_summary.append({
             'game': game,
+            'title': game.get_game_title(),
             'left_team_wins': left_team_wins,
             'right_team_wins': right_team_wins,
             'left_team': f"{game.matches.first().left_offense.name} & {game.matches.first().left_defense.name}",
@@ -39,13 +40,15 @@ def home(request):
 
     players = Player.objects.all()
 
-    return render(request, 'games/home.html', {
+    context = {
         'ongoing_games': ongoing_games,
         'completed_games': completed_games,
         'game_summary': game_summary,
         'whitewashes': whitewashes,
         'players': players
-    })
+    }
+
+    return render(request, 'games/home.html', context)
 
 
 class PlayerListView(ListView):
@@ -81,6 +84,7 @@ class GameListView(ListView):
 
 class GameDetailView(DetailView):
     model = Game
+
     template_name = 'games/game_detail.html'
 
 
@@ -98,8 +102,7 @@ class GameUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('game-list')
 
 
-@login_required
-def mark_game_as_completed(request, pk):
+def mark_game_completed(request, pk):
     game = get_object_or_404(Game, pk=pk)
     game.in_progress = False
     game.save()

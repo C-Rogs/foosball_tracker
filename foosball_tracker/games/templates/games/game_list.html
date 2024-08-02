@@ -9,8 +9,7 @@
         {% for game in games %}
         <div class="game-item">
             <div class="game-header">
-                <p>{{ game.left_offense.name }} & {{ game.left_defense.name }} ({{ game.left_wins }} wins)</p>
-                <p>{{ game.right_offense.name }} & {{ game.right_defense.name }} ({{ game.right_wins }} wins)</p>
+                <p>{{game.get_game_title}}<a style="font-weight:normal "> - {% if game.in_progress %} In progress {% else %} Completed {% endif %}</a></p> 
             </div>
             <p>Date: {{ game.date|date:"d M Y" }}</p>
             <a href="{% url 'game-detail' game.id %}" class="button">View Details</a>
@@ -19,6 +18,5 @@
         <p>No games found</p>
         {% endfor %}
     </div>
-    <a href="{% url 'game-create' %}" class="button">Add New Game</a>
 </div>
 {% endblock %}
