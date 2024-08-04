@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import Sum, Q, F
+from django.db.models import Sum, Q, F, Count, Case, When, IntegerField, Value
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
@@ -40,12 +40,55 @@ class Player(models.Model):
                        Match.objects.filter(right_offense=self, right_score__gt=F('left_score')).count()
         return 'Defense' if defense_wins > offense_wins else 'Offense'
 
-    def most_successful_teammate(self):
-        from django.db.models import Count
-        teammates = Player.objects.annotate(
-            win_count=Count('left_defense_matches__left_offense') + Count('right_defense_matches__right_offense')
-        ).order_by('-win_count')
-        return teammates.first()
+    def most_successful_teammate(self):        
+
+        # Check if the player has any matches
+        if not Match.objects.filter(
+            Q(left_offense=self) | Q(left_defense=self) | Q(right_offense=self) | Q(right_defense=self)
+        ).exists():
+            return None  # No matches found, return None
+
+        # Annotate teammates and count matches and wins with the player
+        teammates = Player.objects.exclude(id=self.id).annotate(
+            total_matches_with=Count(
+                Case(
+                    When(Q(left_offense_matches__left_defense=self) | Q(left_offense_matches__right_offense=self) | Q(left_offense_matches__right_defense=self) |
+                        Q(left_defense_matches__left_offense=self) | Q(left_defense_matches__right_offense=self) | Q(left_defense_matches__right_defense=self) |
+                        Q(right_offense_matches__left_offense=self) | Q(right_offense_matches__left_defense=self) | Q(right_offense_matches__right_defense=self) |
+                        Q(right_defense_matches__left_offense=self) | Q(right_defense_matches__left_defense=self) | Q(right_defense_matches__right_offense=self),
+                        then=1),
+                    output_field=IntegerField()
+                )
+            ),
+            win_count=Count(
+                Case(
+                    When(Q(left_offense_matches__left_defense=self, left_offense_matches__left_score__gt=F('left_offense_matches__right_score')) |
+                        Q(left_offense_matches__right_offense=self, left_offense_matches__left_score__gt=F('left_offense_matches__right_score')) |
+                        Q(left_offense_matches__right_defense=self, left_offense_matches__left_score__gt=F('left_offense_matches__right_score')) |
+                        Q(left_defense_matches__left_offense=self, left_defense_matches__left_score__gt=F('left_defense_matches__right_score')) |
+                        Q(left_defense_matches__right_offense=self, left_defense_matches__left_score__gt=F('left_defense_matches__right_score')) |
+                        Q(left_defense_matches__right_defense=self, left_defense_matches__left_score__gt=F('left_defense_matches__right_score')) |
+                        Q(right_offense_matches__left_offense=self, right_offense_matches__right_score__gt=F('right_offense_matches__left_score')) |
+                        Q(right_offense_matches__left_defense=self, right_offense_matches__right_score__gt=F('right_offense_matches__left_score')) |
+                        Q(right_offense_matches__right_defense=self, right_offense_matches__right_score__gt=F('right_offense_matches__left_score')) |
+                        Q(right_defense_matches__left_offense=self, right_defense_matches__right_score__gt=F('right_defense_matches__left_score')) |
+                        Q(right_defense_matches__left_defense=self, right_defense_matches__right_score__gt=F('right_defense_matches__left_score')) |
+                        Q(right_defense_matches__right_offense=self, right_defense_matches__right_score__gt=F('right_defense_matches__left_score')),
+                        then=1),
+                    output_field=IntegerField()
+                )
+            )
+        ).annotate(
+            win_ratio=F('win_count') * 1.0 / F('total_matches_with')
+        ).order_by('-win_ratio')
+
+        # Get the top teammate
+        if teammates.exists():
+            return teammates.first()
+        else:
+            return None
+        
+
 
 class Game(models.Model):
     date = models.DateTimeField(default=timezone.now)
