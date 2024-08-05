@@ -1,10 +1,11 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from .views import (
     home, PlayerListView, PlayerDetailView, PlayerCreateView, PlayerUpdateView,
     GameListView, GameDetailView, GameCreateView, GameUpdateView, add_match,
-    CustomLoginView, CustomLogoutView, mark_game_completed,SignupView
+     mark_game_completed,SignupView
 )
-
+#CustomLoginView, CustomLogoutView,
 urlpatterns = [
     path('', home, name='home'),
     path('players/', PlayerListView.as_view(), name='player-list'),
@@ -22,8 +23,12 @@ urlpatterns = [
     path('games/<int:pk>/complete/', mark_game_completed, name='mark-game-completed'),
 
 
-    path('login/', CustomLoginView.as_view(), name='login'),
-    path('logout/', CustomLogoutView.as_view(), name='logout'),
-    path('signup/', SignupView.as_view(), name='signup'),
+    #path('login/', CustomLoginView.as_view(), name='login'),
+    #path('logout/', CustomLogoutView.as_view(), name='logout'),
+    #path('signup/', SignupView.as_view(), name='signup'),
+    #path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    #path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    #path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    #path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
 ]

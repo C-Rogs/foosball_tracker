@@ -127,14 +127,14 @@ def add_match(request, game_id):
         form = MatchForm()
     return render(request, 'games/add_match.html', {'form': form, 'game': game})
 
-
+'''
 class CustomLoginView(LoginView):
     template_name = 'games/login.html'
 
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('home')
-
+'''
 
 class SignupView(View):
     def get(self, request):
