@@ -15,7 +15,7 @@ def home(request):
     ongoing_games = Game.objects.filter(in_progress=True)
     completed_games = Game.objects.filter(in_progress=False)
 
-    # Create a summary for completed games
+    #summary for completed games
     game_summary = []
     for game in completed_games:
         matches = game.matches.all()
@@ -38,14 +38,14 @@ def home(request):
         Q(left_score=10, right_score=0) | Q(left_score=0, right_score=10)
     ).order_by('-date')[:5]
 
-    players = Player.objects.all()
+    top_players = Player.objects.filter(is_active=True).with_games_won()[:5]
 
     context = {
         'ongoing_games': ongoing_games,
         'completed_games': completed_games,
         'game_summary': game_summary,
         'whitewashes': whitewashes,
-        'players': players
+        'players': top_players
     }
 
     return render(request, 'games/home.html', context)
@@ -55,6 +55,8 @@ class PlayerListView(ListView):
     model = Player
     template_name = 'games/player_list.html'
     context_object_name = 'players'
+
+
 
 
 class PlayerDetailView(DetailView):

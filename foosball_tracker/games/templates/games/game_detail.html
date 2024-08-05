@@ -5,11 +5,9 @@
 {% block content %}
 <div class="container">
     <h1 class="section-title">Game Details: {{ game.get_game_title }}</h1>
-
     <div class="game-detail">
         <p><strong>Date:</strong> {{ game.date|date:"d M Y" }}</p>
         <p><strong>Status:</strong> {% if game.in_progress %}Ongoing{% else %}Completed{% endif %}</p>
-
         <h2>Matches</h2>
         <div class="matches-list">
             {% for match in game.matches.all %}

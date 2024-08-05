@@ -54,58 +54,42 @@ footer {
     background-color: #f8f8f8;
     padding: 10px 0;
     text-align: center;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-header {
-    border-bottom: none;
-    border-radius: 0 0 15px 15px;
-}
-
-footer {
     border-top: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 15px 15px 0 0;
 }
 
-/* Content Area Styling */
-.top-players, .ongoing-games, .completed-games, .whitewashes, .matches {
+/* Box Styling for Content Areas */
+.box {
     background: rgba(255, 255, 255, 0.9);
     padding: 20px;
     border-radius: 15px;
     border: 1px solid #ddd;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
-
-}
-.top-players a, .ongoing-games a, .completed-games a, .whitewashes a, .matches {
-    margin-top: 1%;
-    text-decoration: none;
 }
 
-.top-players h2, .ongoing-games h2, .completed-games h2, .whitewashes h2 {
-    margin-top: 1px;
-    margin-bottom: 1px;
+.box h2 {
+    margin: 0 0 10px 0;
 }
 
-
-.top-players ul, .ongoing-games ul, .completed-games ul, .whitewashes ul {
+.box ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
 
-.top-players li, .ongoing-games li, .completed-games li, .whitewashes li {
+.box li {
     padding: 10px 0;
     border-bottom: 1px solid #ddd;
 }
 
-.top-players li:last-child, .ongoing-games li:last-child, .completed-games li:last-child, .whitewashes li:last-child {
+.box li:last-child {
     border-bottom: none;
 }
 
 /* Button Styling */
-button {
+button, a.button {
     background-color: #ff6600;
     color: white;
     border: none;
@@ -120,30 +104,8 @@ button {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
+button:hover, a.button:hover {
     background-color: #cc5200;
-}
-
-a.button {
-    background-color: #ff6600;
-    color: white;
-    border: none;
-    padding: 2px 6px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    margin: 1px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-a.button:hover {
-    background-color: #cc5200;
-}
-
-.navbar-right {
-    margin-left: auto; /* Pushes the button to the far right */
 }
 
 /* Section Title */
@@ -153,25 +115,22 @@ a.button:hover {
 }
 
 /* Player List Styling */
-.player-list {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #ccc;
-}
-
-.player-list ul {
+.player-list ul, .game-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
 
-.player-list li {
-    padding: 10px 0;
+.player-list li, .game-item {
+    padding: 15px;
     border-bottom: 1px solid #ccc;
 }
 
-.player-list li a {
+.player-list li:last-child, .game-item:last-child {
+    border-bottom: none;
+}
+
+.player-list li a, .game-header p {
     text-decoration: none;
     color: #333;
     font-size: 16px;
@@ -181,36 +140,44 @@ a.button:hover {
     text-decoration: underline;
 }
 
-/* Game List Styling */
-.game-list {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #ccc;
-}
-
-.game-item {
-    padding: 15px;
-    border-bottom: 1px solid #ccc;
-}
-
-.game-item:last-child {
-    border-bottom: none;
-}
-
-.game-header p {
-    margin: 0;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.game-header p:last-child {
-    margin-top: 5px;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
     }
+}
+
+/* Custom Styles for Specific Sections */
+.top-players, .ongoing-games, .completed-games, .whitewashes, .matches {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.top-players a, .ongoing-games a, .completed-games a, .whitewashes a, .matches a {
+    margin-top: 1%;
+    text-decoration: none;
+}
+
+.top-players h2, .ongoing-games h2, .completed-games h2, .whitewashes h2 {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.top-players ul, .ongoing-games ul, .completed-games ul, .whitewashes ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.top-players li, .ongoing-games li, .completed-games li, .whitewashes li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.top-players li:last-child, .ongoing-games li:last-child, .completed-games li:last-child, .whitewashes li:last-child {
+    border-bottom: none;
 }

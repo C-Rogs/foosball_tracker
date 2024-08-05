@@ -2,12 +2,32 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import Sum, Q, F, Count, Case, When, IntegerField, Value
+from django.db.models import Sum, Q, F, Count, Case, When, IntegerField, Value, QuerySet
 
+
+class PlayerQuerySet(QuerySet):
+    def with_games_won(self):
+        return self.annotate(
+            games_won_count=Count(
+                Case(
+                    When(
+                        Q(left_offense_matches__left_score__gt=F('left_offense_matches__right_score')) |
+                        Q(left_defense_matches__left_score__gt=F('left_defense_matches__right_score')) |
+                        Q(right_offense_matches__right_score__gt=F('right_offense_matches__left_score')) |
+                        Q(right_defense_matches__right_score__gt=F('right_defense_matches__left_score')),
+                        then=1
+                    ),
+                    output_field=IntegerField()
+                )
+            )
+        ).order_by('-games_won_count')
+    
 class Player(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(unique=True, max_length=100)
     start_date = models.DateField(default=timezone.now)
     is_active = models.BooleanField(default=True)
+
+    objects = PlayerQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -42,13 +62,13 @@ class Player(models.Model):
 
     def most_successful_teammate(self):        
 
-        # Check if the player has any matches
+        #check if the player has any matches
         if not Match.objects.filter(
             Q(left_offense=self) | Q(left_defense=self) | Q(right_offense=self) | Q(right_defense=self)
         ).exists():
-            return None  # No matches found, return None
+            return None
 
-        # Annotate teammates and count matches and wins with the player
+        #Link teammates and count matches and wins with the player
         teammates = Player.objects.exclude(id=self.id).annotate(
             total_matches_with=Count(
                 Case(
@@ -92,7 +112,7 @@ class Player(models.Model):
 
 class Game(models.Model):
     date = models.DateTimeField(default=timezone.now)
-    in_progress = models.BooleanField(default=True)  # To track ongoing games
+    in_progress = models.BooleanField(default=True)  #ongoing games
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     left_team_wins = models.IntegerField(default=0)
     right_team_wins = models.IntegerField(default=0)

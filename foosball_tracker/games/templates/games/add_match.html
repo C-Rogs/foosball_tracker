@@ -3,11 +3,12 @@
 {% block title %}Add Match{% endblock %}
 
 {% block content %}
-<h1>Add Match to {{ game }}</h1>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Match</button>
-</form>
+<div class="container">
+    <h1 class="section-title">Add Match to {{ game.get_game_title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Match</button>
+    </form>
+</div>
 {% endblock %}
