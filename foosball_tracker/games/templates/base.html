@@ -16,6 +16,7 @@
           <li><a href="{% url 'player-list' %}">Players</a></li>
           <li><a href="{% url 'game-list' %}">Games</a></li>
           {% if user.is_authenticated %}
+          <li><a href="{% url 'match-list' %}">Matches</a></li>
           <li>
             <form
               action="{% url 'logout' %}"

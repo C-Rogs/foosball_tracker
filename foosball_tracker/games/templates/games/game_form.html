@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Start New Game{% endblock %}
+{% block title %}Edit Game{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1 class="section-title">Start New Game</h1>
+    <h1 class="section-title">{% if game.pk %}Edit{% else %}New{% endif %} Game</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Save</button>
+        <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </div>
 {% endblock %}

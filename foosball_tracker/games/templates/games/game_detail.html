@@ -12,14 +12,19 @@
         <div class="matches-list">
             {% for match in game.matches.all %}
                 <div class="match-item">
+                    <a href="{% url 'match-detail' match.pk %}">
                     <p>{{ match.left_offense.name }} & {{ match.left_defense.name }} ({{ match.left_score }}) vs 
                     {{ match.right_offense.name }} & {{ match.right_defense.name }} ({{ match.right_score }})</p>
+                    </a>
                 </div>
             {% empty %}
                 <p>No matches for this game.</p>
             {% endfor %}
         </div>
-
+        {% if user.is_authenticated %}
+        <a href="{% url 'game-update' game.pk %}" class="button">Edit</a>
+        <a href="{% url 'game-delete' game.pk %}" class="button">Delete</a>
+    {% endif %}
         {% if game.in_progress %}
             <a href="{% url 'add-match' game.id %}" class="button">Add Match</a>
             <form action="{% url 'mark-game-completed' game.id %}" method="post" style="display:inline;">
@@ -29,8 +34,6 @@
         {% else %}
             <p>This game is completed and no new matches can be added.</p>
         {% endif %}
-
-        <a href="{% url 'game-list' %}" class="button">Back to Game List</a>
     </div>
 </div>
 {% endblock %}

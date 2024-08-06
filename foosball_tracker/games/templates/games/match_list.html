@@ -3,13 +3,24 @@
 {% block title %}Match List{% endblock %}
 
 {% block content %}
-<h1>Match List</h1>
-
 <div class="container">
-    <div class="current-games">
+    <h1 class="section-title">Match List</h1>
+    <div class="game-list">
         {% for match in matches %}
             <div class="match-item">
-                <p>{{ match.left_offense.name }} & {{ match.left_defense.name }}: {{ match.left_score }} - {{ match.right_score }} {{ match.right_offense.name }} & {{ match.right_defense.name }}</p>
+                <p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'match-detail' match.pk %}">
+                            {{ match.left_offense.name }} & {{ match.left_defense.name }}: 
+                            {{ match.left_score }} - {{ match.right_score }} 
+                            {{ match.right_offense.name }} & {{ match.right_defense.name }}
+                        </a>
+                    {% else %}
+                        {{ match.left_offense.name }} & {{ match.left_defense.name }}: 
+                        {{ match.left_score }} - {{ match.right_score }} 
+                        {{ match.right_offense.name }} & {{ match.right_defense.name }}
+                    {% endif %}
+                </p>
             </div>
         {% empty %}
             <p>No matches available.</p>

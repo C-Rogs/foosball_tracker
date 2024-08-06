@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Player, Game, Match
 from .forms import PlayerForm, MatchForm, GameForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,10 +13,10 @@ from django.views import View
 
 def home(request):
     ongoing_games = Game.objects.filter(in_progress=True)
-    completed_games = Game.objects.filter(in_progress=False)
+    completed_games = Game.objects.filter(in_progress=False).prefetch_related('matches')
 
     #summary for completed games
-    game_summary = []
+    '''game_summary = []
     for game in completed_games:
         matches = game.matches.all()
         left_team_wins = matches.filter(
@@ -32,7 +32,20 @@ def home(request):
             'right_team_wins': right_team_wins,
             'left_team': f"{game.matches.first().left_offense.name} & {game.matches.first().left_defense.name}",
             'right_team': f"{game.matches.first().right_offense.name} & {game.matches.first().right_defense.name}"
-        })
+        })'''
+
+    game_summary = [
+        {
+            'game': game,
+            'title': game.get_game_title(),
+            'left_team_wins': game.matches.filter(left_score__gt=F('right_score')).count(),
+            'right_team_wins': game.matches.filter(right_score__gt=F('left_score')).count(),
+            'left_team': f"{game.matches.first().left_offense.name} & {game.matches.first().left_defense.name}",
+            'right_team': f"{game.matches.first().right_offense.name} & {game.matches.first().right_defense.name}"
+        }
+        for game in completed_games
+    ]
+
 
     whitewashes = Match.objects.filter(
         Q(left_score=10, right_score=0) | Q(left_score=0, right_score=10)
@@ -103,6 +116,10 @@ class GameUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'games/game_form.html'
     success_url = reverse_lazy('game-list')
 
+class GameDeleteView(LoginRequiredMixin, DeleteView):
+    model = Game
+    template_name = 'games/game_confirm_delete.html'
+    success_url = reverse_lazy('game-list')
 
 def mark_game_completed(request, pk):
     game = get_object_or_404(Game, pk=pk)
@@ -127,14 +144,31 @@ def add_match(request, game_id):
         form = MatchForm()
     return render(request, 'games/add_match.html', {'form': form, 'game': game})
 
-'''
-class CustomLoginView(LoginView):
-    template_name = 'games/login.html'
+class MatchDetailView(LoginRequiredMixin, DetailView):
+    model = Match
+    template_name = 'games/match_detail.html'
+    context_object_name = 'match'
 
+class MatchListView(ListView):
+    model = Match
+    template_name = 'matches/match_list.html'
+    context_object_name = 'matches'
 
-class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('home')
-'''
+class MatchUpdateView(LoginRequiredMixin, UpdateView):
+    model = Match
+    form_class = MatchForm
+    template_name = 'games/match_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('match-detail', kwargs={'pk': self.object.pk})
+
+class MatchDeleteView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        match = get_object_or_404(Match, pk=kwargs['pk'])
+        game_id = match.game.id
+        match.delete()
+        return redirect('game-detail', pk=game_id)
+
 
 class SignupView(View):
     def get(self, request):

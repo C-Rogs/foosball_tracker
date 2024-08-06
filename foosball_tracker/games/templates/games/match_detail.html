@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Match Detail{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="section-title">Match Detail</h1>
+    <div class="match-detail">
+        <p>
+            <strong>Left Team:</strong> {{ match.left_offense.name }} & {{ match.left_defense.name }}<br>
+            <strong>Right Team:</strong> {{ match.right_offense.name }} & {{ match.right_defense.name }}<br>
+            <strong>Score:</strong> {{ match.left_score }} - {{ match.right_score }}<br>
+            <strong>Date:</strong> {{ match.date }}
+        </p>
+        {% if user.is_authenticated %}
+            <form action="{% url 'match-update' match.pk %}" method="get" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Edit</button>
+            </form>
+            | 
+            <form action="{% url 'match-delete' match.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
