@@ -59,6 +59,10 @@ MIDDLEWARE = [
 
 ]
 
+CORS_ORIGIN_WHITELIST = [
+    'https://localhost:3000',
+    'http://localhost:8080'
+]
 CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = 'foosball_tracker.urls'
 
