@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework', 
     'games',
     'api',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -55,11 +54,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = 'foosball_tracker.urls'
 
 TEMPLATES = [
@@ -83,7 +79,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
-
 
 WSGI_APPLICATION = 'foosball_tracker.wsgi.application'
 
